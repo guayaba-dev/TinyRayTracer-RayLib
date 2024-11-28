@@ -1,10 +1,5 @@
 /*******************************************************************************************
  *
- *   raylib game template
- *
- *   <Game title>
- *   <Game description>
- *
  *   This game has been created using raylib (www.raylib.com)
  *   raylib is licensed under an unmodified zlib/libpng license (View raylib.h
  *for details)
@@ -12,6 +7,8 @@
  *   Copyright (c) 2021 Ramon Santamaria (@raysan5)
  *
  ********************************************************************************************/
+
+#include <stdio.h>
 
 #include "raylib.h"
 #include "screens.h"  // NOTE: Declares global (extern) variables and screens functions
@@ -24,14 +21,15 @@
 // Shared Variables Definition (global)
 // NOTE: Those variables are shared between modules through screens.h
 //----------------------------------------------------------------------------------
+
 GameScreen currentScreen = LOGO;
+
 Font font = {0};
-Music music = {0};
-Sound fxCoin = {0};
 
 //----------------------------------------------------------------------------------
 // Local Variables Definition (local to this module)
 //----------------------------------------------------------------------------------
+
 static const int screenWidth = 800;
 static const int screenHeight = 450;
 
@@ -45,6 +43,7 @@ static GameScreen transToScreen = UNKNOWN;
 //----------------------------------------------------------------------------------
 // Local Functions Declaration
 //----------------------------------------------------------------------------------
+
 static void ChangeToScreen(int screen);
 // Change to screen, no transition effect
 
@@ -63,31 +62,21 @@ static void UpdateDrawFrame(void);
 //----------------------------------------------------------------------------------
 // Main entry point
 //----------------------------------------------------------------------------------
+
 int main(void) {
-  // Initialization
-  //---------------------------------------------------------
   InitWindow(screenWidth, screenHeight, "raylib game template");
+  // Initialization
 
   InitAudioDevice();
   // Initialize audio device
 
   font = LoadFont("resources/mecha.png");
-  // Load global data (assets that must be available in all screens, i.e. font)
-
-  music = LoadMusicStream("resources/ambient.ogg");
-  // TODO: Replace with no copyrighted music
-
-  fxCoin = LoadSound("resources/coin.wav");
-
-  // SetMusicVolume(music, 1.0f);
-  // PlayMusicStream(music);
 
 #if defined(PLATFORM_WEB)
   emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
 
 #else
   SetTargetFPS(60);  // Set our game to run at 60 frames-per-second
-  //--------------------------------------------------------------------------------------
 
   // Main game loop
   while (!WindowShouldClose())  // Detect window close button or ESC key
@@ -104,24 +93,22 @@ int main(void) {
     case LOGO:
       UnloadLogoScreen();
       break;
-    case OPTIONS:
-      UnloadOptionsScreen();
-      break;
+
     case GAMEPLAY:
       UnloadGameplayScreen();
       break;
+
     default:
       break;
   }
 
   // Unload global data loaded
   UnloadFont(font);
-  UnloadMusicStream(music);
-  UnloadSound(fxCoin);
 
   CloseAudioDevice();  // Close audio context
 
   CloseWindow();  // Close window and OpenGL context
+
   //--------------------------------------------------------------------------------------
 
   return 0;
@@ -131,18 +118,18 @@ int main(void) {
 // Module specific Functions Definition
 //----------------------------------------------------------------------------------
 // Change to next screen, no transition
+
 static void ChangeToScreen(int screen) {
   // Unload current screen
   switch (currentScreen) {
     case LOGO:
       UnloadLogoScreen();
       break;
-    case OPTIONS:
-      UnloadOptionsScreen();
-      break;
+
     case GAMEPLAY:
       UnloadGameplayScreen();
       break;
+
     default:
       break;
   }
@@ -152,12 +139,11 @@ static void ChangeToScreen(int screen) {
     case LOGO:
       InitLogoScreen();
       break;
-    case OPTIONS:
-      InitOptionsScreen();
-      break;
+
     case GAMEPLAY:
       InitGameplayScreen();
       break;
+
     default:
       break;
   }
@@ -190,12 +176,11 @@ static void UpdateTransition(void) {
         case LOGO:
           UnloadLogoScreen();
           break;
-        case OPTIONS:
-          UnloadOptionsScreen();
-          break;
+
         case GAMEPLAY:
           UnloadGameplayScreen();
           break;
+
         default:
           break;
       }
@@ -205,12 +190,11 @@ static void UpdateTransition(void) {
         case LOGO:
           InitLogoScreen();
           break;
-        case OPTIONS:
-          InitOptionsScreen();
-          break;
+
         case GAMEPLAY:
           InitGameplayScreen();
           break;
+
         default:
           break;
       }
@@ -244,28 +228,19 @@ static void DrawTransition(void) {
 static void UpdateDrawFrame(void) {
   // Update
   //----------------------------------------------------------------------------------
-  // UpdateMusicStream(music);       // NOTE: Music keeps playing between
-  // screens
 
+  // screens
   if (!onTransition) {
     switch (currentScreen) {
       case LOGO: {
         UpdateLogoScreen();
-
-        // if (FinishLogoScreen()) TransitionToScreen(TITLE);
         if (FinishLogoScreen()) TransitionToScreen(GAMEPLAY);
-
       } break;
-      case OPTIONS: {
-        UpdateOptionsScreen();
 
-        if (FinishOptionsScreen()) TransitionToScreen(GAMEPLAY);
-      } break;
       case GAMEPLAY: {
         UpdateGameplayScreen();
-        // if (FinishGameplayScreen() == 1) TransitionToScreen(ENDING);
-        // else if (FinishGameplayScreen() == 2) TransitionToScreen(TITLE);
       } break;
+
       default:
         break;
     }
@@ -282,9 +257,6 @@ static void UpdateDrawFrame(void) {
   switch (currentScreen) {
     case LOGO:
       DrawLogoScreen();
-      break;
-    case OPTIONS:
-      DrawOptionsScreen();
       break;
     case GAMEPLAY:
       DrawGameplayScreen();

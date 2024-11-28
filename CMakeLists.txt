@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.24...3.30)
-project(raylib-game-template)
+cmake_minimum_required(VERSION 3.24...3.31)
+project(TinyRayTracer-RAYLIB)
 
 include(FetchContent)
 
@@ -56,4 +56,12 @@ if (APPLE)
     target_link_libraries(${PROJECT_NAME} "-framework IOKit")
     target_link_libraries(${PROJECT_NAME} "-framework Cocoa")
     target_link_libraries(${PROJECT_NAME} "-framework OpenGL")
+endif()
+
+# Option to enable Debug Mode
+option(DEBUG_MODE "Enable Debug Mode" OFF)
+
+# Add compile definitions for Debug Mode if enabled
+if(DEBUG_MODE)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG_MODE)
 endif()
