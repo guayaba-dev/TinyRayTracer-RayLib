@@ -252,7 +252,7 @@ static void UpdateDrawFrame(void) {
   //----------------------------------------------------------------------------------
   BeginDrawing();
 
-  ClearBackground(RAYWHITE);
+  ClearBackground(WHITE);
 
   switch (currentScreen) {
     case LOGO:

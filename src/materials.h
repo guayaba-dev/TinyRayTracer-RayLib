@@ -4,8 +4,10 @@
 typedef struct _Material {
   Color diffuseColor;
   float albido[4];
-  // intesity of diffuse light, specular light,
-  //             reflectiveness and refraction
+  // Intesity of diffuse light
+  // Specular light
+  // Reflectiveness
+  // Refraction
 } _Material;
 
 // TODO: write the functions for materials to work properly

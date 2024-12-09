@@ -59,12 +59,18 @@ void main()
             {
                 light = normalize(lights[i].position - fragPosition);
             }
-
+            
+            float lightDistance = distance(lights[i].position, fragPosition);
+      
+            //Diffuse light
             float NdotL = max(dot(normal, light), 0.0);
-            lightDot += lights[i].color.rgb*NdotL;
+            float lightForce = NdotL;
+            lightDot += (lights[i].color.rgb*NdotL*2./(lightDistance*lightDistance));
 
+            //specular light
             float specCo = 0.0;
-            if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewD, reflect(-(light), normal))), 16.0); // 16 refers to shine
+            if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewD, reflect(-(light), normal)))*2./(lightDistance*lightDistance), 16.0);
+            // 16 refers to shine
             specular += specCo;
         }
     }

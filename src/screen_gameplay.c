@@ -27,13 +27,14 @@
  *
  **********************************************************************************************/
 
-#include <stdio.h>
-
+#include "lights.h"
+#include "materials.h"
 #include "raylib.h"
+#include "raymath.h"
 #include "rcamera.h"
 #include "screens.h"
 
-#define GLSL_VERSION 300
+#define GLSL_VERSION 100
 
 //----------------------------------------------------------------------------------
 // Module Variables Definition (local)
@@ -42,13 +43,21 @@ static int framesCounter = 0;
 static int finishScreen = 0;
 static Camera camera = {0};
 static Shader shader;
+
+Mesh cubeMesh;
+Model cubeModel;
+
+Mesh sphereMesh;
+Model sphereModel;
+
+Mesh planeMesh;
+Model planeModel;
 //----------------------------------------------------------------------------------
 // Gameplay Screen Functions Definition
 //----------------------------------------------------------------------------------
 
 // Gameplay Screen Initialization logic
 void InitGameplayScreen(void) {
-  printf("ScreenGameplay showing up");
   framesCounter = 0;
   finishScreen = 0;
 
@@ -60,13 +69,50 @@ void InitGameplayScreen(void) {
   shader =
       LoadShader(TextFormat("resources/shaders/RayTracer.vert", GLSL_VERSION),
                  TextFormat("resources/shaders/RayTracer.frag", GLSL_VERSION));
+
+  cubeMesh = GenMeshCube(1.0f, 1.0f,
+                         1.0f);  // Tamaño del cubo (ancho, alto, profundidad)
+  cubeModel = LoadModelFromMesh(cubeMesh);  // Crea un modelo a partir del mesh
+
+  cubeModel.materials[0].shader = shader;  // Asigna tu shader al modelo
+
+  sphereMesh = GenMeshSphere(.5, 10, 10);
+
+  sphereModel = LoadModelFromMesh(sphereMesh);
+
+  sphereModel.materials[0].shader = shader;
+
+  planeMesh = GenMeshPlane(2., 2., 2, 2);
+
+  planeModel = LoadModelFromMesh(planeMesh);
+
+  planeModel.transform =
+      MatrixMultiply(planeModel.transform, MatrixRotateX(0.01f));
+
+  planeModel.materials[0].shader = shader;
+
+  // Ambient light level (some basic lighting)
+  int ambientLoc = GetShaderLocation(shader, "ambient");
+  SetShaderValue(shader, ambientLoc, (float[4]){0.1f, 0.1f, 0.1f, 1.0f},
+                 SHADER_UNIFORM_VEC4);
+
+  shader.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(shader, "viewPos");
+
+  createLight(LIGHT_POINT, (Vector3){1.f, 1.f, 1.f}, (Vector3){0}, WHITE,
+              shader);
 }
 
 // Gameplay Screen Update logic
 void UpdateGameplayScreen(void) {
   UpdateCamera(&camera, CAMERA_PERSPECTIVE);
 
-  // Press enter or tap to change to ENDING screen
+  float cameraPosition[3] = {camera.position.x, camera.position.y,
+                             camera.position.z};
+
+  SetShaderValue(shader, shader.locs[SHADER_LOC_VECTOR_VIEW], cameraPosition,
+                 SHADER_UNIFORM_VEC3);
+
+  // Press enter to change to ENDING screen
   if (IsKeyPressed(KEY_ENTER)) {
     finishScreen = 1;
   }
@@ -74,25 +120,27 @@ void UpdateGameplayScreen(void) {
 
 // Gameplay Screen Draw logic
 void DrawGameplayScreen(void) {
-  BeginDrawing();
-
-  ClearBackground((Color){0});
+  ClearBackground(BLACK);
 
   BeginMode3D(camera);
 
-  DrawSphereEx((Vector3){0}, 0.5f, 10.f, 10.f, WHITE);
-
   BeginShaderMode(shader);
+
+  DrawModel(cubeModel, (Vector3){0.0f, 0.0f, 0.0f}, .5, RED);
+  DrawModel(sphereModel, (Vector3){2.0f, 0.0f, 0.0f}, .5, BLUE);
+  DrawModel(cubeModel, (Vector3){2.0f, 0.0f, 2.0f}, .5, GREEN);
+  DrawModel(sphereModel, (Vector3){0.0f, 0.0f, 2.0f}, .5, YELLOW);
+  DrawModel(planeModel, (Vector3){1.0f, 0.0f, 1.0f}, 2.f, WHITE);
 
   EndShaderMode();
 
-  EndMode3D();
+  drawLights();
 
-  EndDrawing();
+  EndMode3D();
 }
 
 // Gameplay Screen Unload logic
 void UnloadGameplayScreen(void) { UnloadShader(shader); }
 
-// Gameplay Screen should finish?
+// Gameplay Screen should finish
 int FinishGameplayScreen(void) { return finishScreen; }
