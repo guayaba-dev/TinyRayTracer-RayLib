@@ -1,13 +1,14 @@
 #include "raylib.h"
 #include "screens.h"
 
-//----------------------------------------------------------------------------------
+#define GLSL_VERSION 100
+
 // Module Variables Definition (local)
 //----------------------------------------------------------------------------------
 static int framesCounter = 0;
 static int finishScreen = 0;
 static Camera camera = {0};
-static Shader shader;
+static Shader shaderRayPathing;
 RenderTexture2D target;
 
 void InitRayPathScreen() {
@@ -16,14 +17,36 @@ void InitRayPathScreen() {
   camera.position = (Vector3){0.f, 4.f, 4.f};
   camera.up = (Vector3){0.f, 1.f, 0.f};
   camera.fovy = 60.f;
-  target = LoadRenderTexture(GetScreenWidth(), GetScreenWidth());
+  target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
   camera.projection = CAMERA_PERSPECTIVE;
+
+  shaderRayPathing = LoadShader(
+      0, TextFormat("resources/shaders/RayPathing.frag", GLSL_VERSION));
 }
 
-void UpdateRayPathScreen() {}
+void drawShaderOnTexture() {
+  BeginTextureMode(target);
+
+  BeginShaderMode(shaderRayPathing);
+
+  DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), WHITE);
+
+  EndShaderMode();
+
+  EndTextureMode();
+}
+
+void UpdateRayPathScreen() {
+  if (IsKeyPressed(KEY_P)) {
+    drawShaderOnTexture();
+  }
+}
 
 void DrawRayPathScreen() { DrawTexture(target.texture, 0, 0, WHITE); }
 
-void UnloadRayPathScreen() {}
+void UnloadRayPathScreen() {
+  UnloadShader(shaderRayPathing);
+  UnloadRenderTexture(target);
+}
 
 int FinishRayPathScreen() { return finishScreen; }

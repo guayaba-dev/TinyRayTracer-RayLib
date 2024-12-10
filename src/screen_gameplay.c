@@ -42,7 +42,7 @@
 static int framesCounter = 0;
 static int finishScreen = 0;
 static Camera camera = {0};
-static Shader shader;
+static Shader shaderLight;
 
 Mesh cubeMesh;
 Model cubeModel;
@@ -66,21 +66,21 @@ void InitGameplayScreen(void) {
   camera.fovy = 60.f;
   camera.projection = CAMERA_PERSPECTIVE;
 
-  shader =
-      LoadShader(TextFormat("resources/shaders/RayTracer.vert", GLSL_VERSION),
-                 TextFormat("resources/shaders/RayTracer.frag", GLSL_VERSION));
+  shaderLight =
+      LoadShader(TextFormat("resources/shaders/PhongLight.vert", GLSL_VERSION),
+                 TextFormat("resources/shaders/PhongLight.frag", GLSL_VERSION));
 
   cubeMesh = GenMeshCube(1.0f, 1.0f,
                          1.0f);  // Tamaño del cubo (ancho, alto, profundidad)
   cubeModel = LoadModelFromMesh(cubeMesh);  // Crea un modelo a partir del mesh
 
-  cubeModel.materials[0].shader = shader;  // Asigna tu shader al modelo
+  cubeModel.materials[0].shader = shaderLight;  // Asigna tu shader al modelo
 
   sphereMesh = GenMeshSphere(.5, 10, 10);
 
   sphereModel = LoadModelFromMesh(sphereMesh);
 
-  sphereModel.materials[0].shader = shader;
+  sphereModel.materials[0].shader = shaderLight;
 
   planeMesh = GenMeshPlane(2., 2., 2, 2);
 
@@ -89,17 +89,18 @@ void InitGameplayScreen(void) {
   planeModel.transform =
       MatrixMultiply(planeModel.transform, MatrixRotateX(0.01f));
 
-  planeModel.materials[0].shader = shader;
+  planeModel.materials[0].shader = shaderLight;
 
   // Ambient light level (some basic lighting)
-  int ambientLoc = GetShaderLocation(shader, "ambient");
-  SetShaderValue(shader, ambientLoc, (float[4]){0.1f, 0.1f, 0.1f, 1.0f},
+  int ambientLoc = GetShaderLocation(shaderLight, "ambient");
+  SetShaderValue(shaderLight, ambientLoc, (float[4]){0.1f, 0.1f, 0.1f, 1.0f},
                  SHADER_UNIFORM_VEC4);
 
-  shader.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(shader, "viewPos");
+  shaderLight.locs[SHADER_LOC_VECTOR_VIEW] =
+      GetShaderLocation(shaderLight, "viewPos");
 
   createLight(LIGHT_POINT, (Vector3){1.f, 1.f, 1.f}, (Vector3){0}, WHITE,
-              shader);
+              shaderLight);
 }
 
 // Gameplay Screen Update logic
@@ -109,8 +110,8 @@ void UpdateGameplayScreen(void) {
   float cameraPosition[3] = {camera.position.x, camera.position.y,
                              camera.position.z};
 
-  SetShaderValue(shader, shader.locs[SHADER_LOC_VECTOR_VIEW], cameraPosition,
-                 SHADER_UNIFORM_VEC3);
+  SetShaderValue(shaderLight, shaderLight.locs[SHADER_LOC_VECTOR_VIEW],
+                 cameraPosition, SHADER_UNIFORM_VEC3);
 
   // Press enter to change to ENDING screen
   if (IsKeyPressed(KEY_ENTER)) {
@@ -124,7 +125,7 @@ void DrawGameplayScreen(void) {
 
   BeginMode3D(camera);
 
-  BeginShaderMode(shader);
+  BeginShaderMode(shaderLight);
 
   DrawModel(cubeModel, (Vector3){0.0f, 0.0f, 0.0f}, .5, RED);
   DrawModel(sphereModel, (Vector3){2.0f, 0.0f, 0.0f}, .5, BLUE);
@@ -141,7 +142,7 @@ void DrawGameplayScreen(void) {
 
 // Gameplay Screen Unload logic
 void UnloadGameplayScreen(void) {
-  UnloadShader(shader);
+  UnloadShader(shaderLight);
   UnloadModel(cubeModel);
   UnloadModel(sphereModel);
   UnloadModel(planeModel);
