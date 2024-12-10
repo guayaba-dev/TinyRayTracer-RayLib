@@ -1,14 +1,11 @@
 /*******************************************************************************************
- *
- *   This game has been created using raylib (www.raylib.com)
+ * This game has been created using raylib (www.raylib.com)
  *   raylib is licensed under an unmodified zlib/libpng license (View raylib.h
  *for details)
  *
  *   Copyright (c) 2021 Ramon Santamaria (@raysan5)
  *
  ********************************************************************************************/
-
-#include <stdio.h>
 
 #include "raylib.h"
 #include "screens.h"  // NOTE: Declares global (extern) variables and screens functions
@@ -98,6 +95,10 @@ int main(void) {
       UnloadGameplayScreen();
       break;
 
+    case RAYPATH:
+      UnloadRayPathScreen();
+      break;
+
     default:
       break;
   }
@@ -130,6 +131,10 @@ static void ChangeToScreen(int screen) {
       UnloadGameplayScreen();
       break;
 
+    case RAYPATH:
+      UnloadRayPathScreen();
+      break;
+
     default:
       break;
   }
@@ -142,6 +147,10 @@ static void ChangeToScreen(int screen) {
 
     case GAMEPLAY:
       InitGameplayScreen();
+      break;
+
+    case RAYPATH:
+      InitRayPathScreen();
       break;
 
     default:
@@ -182,6 +191,7 @@ static void UpdateTransition(void) {
           break;
 
         default:
+          UnloadRayPathScreen();
           break;
       }
 
@@ -194,6 +204,9 @@ static void UpdateTransition(void) {
         case GAMEPLAY:
           InitGameplayScreen();
           break;
+
+        case RAYPATH:
+          InitRayPathScreen();
 
         default:
           break;
@@ -239,6 +252,11 @@ static void UpdateDrawFrame(void) {
 
       case GAMEPLAY: {
         UpdateGameplayScreen();
+        if (FinishGameplayScreen()) TransitionToScreen(RAYPATH);
+      } break;
+
+      case RAYPATH: {
+        UpdateRayPathScreen();
       } break;
 
       default:
@@ -261,6 +279,8 @@ static void UpdateDrawFrame(void) {
     case GAMEPLAY:
       DrawGameplayScreen();
       break;
+    case RAYPATH:
+      DrawRayPathScreen();
     default:
       break;
   }
@@ -268,7 +288,7 @@ static void UpdateDrawFrame(void) {
   // Draw full screen rectangle in front of everything
   if (onTransition) DrawTransition();
 
-  // DrawFPS(10, 10);
+  DrawFPS(10, 10);
 
   EndDrawing();
   //----------------------------------------------------------------------------------

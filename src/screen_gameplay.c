@@ -140,7 +140,12 @@ void DrawGameplayScreen(void) {
 }
 
 // Gameplay Screen Unload logic
-void UnloadGameplayScreen(void) { UnloadShader(shader); }
+void UnloadGameplayScreen(void) {
+  UnloadShader(shader);
+  UnloadModel(cubeModel);
+  UnloadModel(sphereModel);
+  UnloadModel(planeModel);
+}
 
 // Gameplay Screen should finish
 int FinishGameplayScreen(void) { return finishScreen; }

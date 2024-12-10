@@ -33,7 +33,12 @@
 //----------------------------------------------------------------------------------
 // Types and Structures Definition
 //----------------------------------------------------------------------------------
-typedef enum GameScreen { UNKNOWN = -1, LOGO = 0, GAMEPLAY } GameScreen;
+typedef enum GameScreen {
+  UNKNOWN = -1,
+  LOGO = 0,
+  GAMEPLAY,
+  RAYPATH
+} GameScreen;
 
 //----------------------------------------------------------------------------------
 // Global Variables Declaration (shared by several modules)
@@ -64,6 +69,15 @@ void UpdateGameplayScreen(void);
 void DrawGameplayScreen(void);
 void UnloadGameplayScreen(void);
 int FinishGameplayScreen(void);
+
+//----------------------------------------------------------------------------------
+// RayPath Screen Functions Declaration
+//----------------------------------------------------------------------------------
+void InitRayPathScreen(void);
+void UpdateRayPathScreen(void);
+void DrawRayPathScreen(void);
+void UnloadRayPathScreen(void);
+int FinishRayPathScreen(void);
 
 #ifdef __cplusplus
 }
