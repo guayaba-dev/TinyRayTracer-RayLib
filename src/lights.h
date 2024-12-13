@@ -26,7 +26,7 @@ void drawLights() {
 
 void createLight(int type, Vector3 position, Vector3 target, Color color,
                  Shader shader) {
-  if (!(totalLights < MAX_LIGHTS)) return;
+  if (totalLights >= MAX_LIGHTS) return;
 
   lights[totalLights].enabled = 1;
   lights[totalLights].type = type;
@@ -42,11 +42,13 @@ void createLight(int type, Vector3 position, Vector3 target, Color color,
   int lightTarLoc[MAX_LIGHTS];
   int lightColLoc[MAX_LIGHTS];
 
+  // TODO: unify both fors into one
   for (int i = 0; i < MAX_LIGHTS; i++) {
     char uniformName[32];
 
     snprintf(uniformName, sizeof(uniformName), "lights[%d].enabled", i);
     lightEnableLoc[i] = GetShaderLocation(shader, uniformName);
+    // SetShaderValue(shader, tlightEnableLoc, &lig,SHADER_UNIFORM_INT);
 
     snprintf(uniformName, sizeof(uniformName), "lights[%d].type", i);
     lightTypeLoc[i] = GetShaderLocation(shader, uniformName);
@@ -64,8 +66,8 @@ void createLight(int type, Vector3 position, Vector3 target, Color color,
   // Enviar datos al shader
   for (int i = 0; i < MAX_LIGHTS; i++) {
     int enabled = lights[i].enabled;
-    // int enabled = 1;
     SetShaderValue(shader, lightEnableLoc[i], &enabled, SHADER_UNIFORM_INT);
+    // int enabled = 1;
 
     int type = lights[i].type;
     SetShaderValue(shader, lightTypeLoc[i], &type, SHADER_UNIFORM_INT);
