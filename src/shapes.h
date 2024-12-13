@@ -1,5 +1,3 @@
-#pragma once
-
 #include <stdio.h>
 
 #include "materials.h"
@@ -29,7 +27,7 @@ SPHERE spheres[MAX_SPHERES] = {0};
 TRIANGLE triangles[MAX_TRIANGLES] = {0};
 
 void createSphere(Vector3 position, float radius, _Material material) {
-  SPHERE tempSphere = {0};
+  SPHERE tempSphere;
   tempSphere.position = position;
   tempSphere.radius = radius;
   tempSphere.material = material;
@@ -55,51 +53,55 @@ void createTriangle(Vector3 vertex[3], _Material material) {
 
 void updateSphereShapeUniforms(Shader shader) {
   for (int i = 0; i < sphereQuantity; i++) {
-    char uniformName[64];  // Incrementado el tamaño para mayor seguridad
+    char uniformName[40];
 
-    // Obtener la ubicación de la posición de la esfera
     snprintf(uniformName, sizeof(uniformName), "u_spheres[%d].position", i);
     int SpherePositionLoc = GetShaderLocation(shader, uniformName);
-    if (SpherePositionLoc == -1) {
-      fprintf(stderr, "Error: Uniform '%s' no encontrado en el shader.\n",
-              uniformName);
-      continue;  // Continuar con la siguiente esfera
-    }
     SetShaderValue(shader, SpherePositionLoc, &spheres[i].position,
                    SHADER_UNIFORM_VEC3);
 
-    // Obtener la ubicación del radio de la esfera
     snprintf(uniformName, sizeof(uniformName), "u_spheres[%d].radius", i);
     int SphereRadiusLoc = GetShaderLocation(shader, uniformName);
-    if (SphereRadiusLoc != -1) {
-      SetShaderValue(shader, SphereRadiusLoc, &spheres[i].radius,
-                     SHADER_UNIFORM_FLOAT);
-    }
+    SetShaderValue(shader, SphereRadiusLoc, &spheres[i].radius,
+                   SHADER_UNIFORM_FLOAT);
 
-    // Obtener el color difuso del material
     snprintf(uniformName, sizeof(uniformName),
              "u_spheres[%d].material.diffuseColor", i);
-    int SphereMaterialDiffuseColorLoc = GetShaderLocation(shader, uniformName);
-    if (SphereMaterialDiffuseColorLoc != -1) {
-      SetShaderValue(shader, SphereMaterialDiffuseColorLoc,
-                     &spheres[i].material.diffuseColor, SHADER_UNIFORM_VEC4);
-    }
+    int SphereMaterialDiffeseColorLoc = GetShaderLocation(shader, uniformName);
+    SetShaderValue(shader, SphereMaterialDiffeseColorLoc,
+                   &spheres[i].material.diffuseColor, SHADER_UNIFORM_VEC4);
 
-    // Obtener y configurar los valores de albido
-    for (int j = 0; j < 4; j++) {
-      snprintf(uniformName, sizeof(uniformName),
-               "u_spheres[%d].material.albido[%d]", i, j);
-      int SphereMaterialAlbidoLoc = GetShaderLocation(shader, uniformName);
-      if (SphereMaterialAlbidoLoc != -1) {
-        SetShaderValue(shader, SphereMaterialAlbidoLoc,
-                       &spheres[i].material.albido[j], SHADER_UNIFORM_FLOAT);
-      }
-    }
+    snprintf(uniformName, sizeof(uniformName),
+             "u_spheres[%d].material.albido[0]", i);
+    int SphereMaterialAlbidoDiffuseLoc = GetShaderLocation(shader, uniformName);
+    SetShaderValue(shader, SphereMaterialAlbidoDiffuseLoc,
+                   &spheres[i].material.albido[0], SHADER_UNIFORM_FLOAT);
+
+    snprintf(uniformName, sizeof(uniformName),
+             "u_spheres[%d].material.albido[1]", i);
+    int SphereMaterialAlbidoSpecularLoc =
+        GetShaderLocation(shader, uniformName);
+    SetShaderValue(shader, SphereMaterialAlbidoSpecularLoc,
+                   &spheres[i].material.albido[1], SHADER_UNIFORM_FLOAT);
+
+    snprintf(uniformName, sizeof(uniformName),
+             "u_spheres[%d].material.albido[2]", i);
+    int SphereMaterialAlbidoReflectiveLoc =
+        GetShaderLocation(shader, uniformName);
+    SetShaderValue(shader, SphereMaterialAlbidoReflectiveLoc,
+                   &spheres[i].material.albido[2], SHADER_UNIFORM_FLOAT);
+
+    snprintf(uniformName, sizeof(uniformName),
+             "u_spheres[%d].material.albido[3]", i);
+    int SphereMaterialAlbidoRefacctionLoc =
+        GetShaderLocation(shader, uniformName);
+    SetShaderValue(shader, SphereMaterialAlbidoRefacctionLoc,
+                   &spheres[i].material.albido[3], SHADER_UNIFORM_FLOAT);
   }
 }
 
 void updateTriangleShapeUniforms(Shader shader) {
-  for (int i = 0; i < MAX_SPHERES; i++) {
+  for (int i = 0; i < triangleQuantity; i++) {
     char uniformName[40];
 
     snprintf(uniformName, sizeof(uniformName), "u_triangles[%d].vertex[0]", i);

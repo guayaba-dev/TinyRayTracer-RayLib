@@ -35,12 +35,8 @@ void main() {
 
   vec3 colorFinal = vec3(0.);
 
-  if(u_spheres[0].position.x == 1){
-    colorFinal.g = 1.; 
-  }
-  else {
-    colorFinal.r = 1.;
-  }
+  colorFinal.r = u_spheres[0].position.x;
+  colorFinal.b = u_triangles[0].vertex[0].x;
 
   gl_FragColor = vec4(colorFinal, 1.0); // Depuración visuali
 }

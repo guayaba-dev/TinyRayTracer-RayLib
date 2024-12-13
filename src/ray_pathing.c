@@ -22,6 +22,8 @@ void drawShaderOnTexture();
 void loadShaders() {
   shaderRayPathing = LoadShader(
       0, TextFormat("resources/shaders/RayPathing.frag", GLSL_VERSION));
+  updateSphereShapeUniforms(shaderRayPathing);
+  updateTriangleShapeUniforms(shaderRayPathing);
   drawShaderOnTexture();
 }
 
@@ -34,7 +36,6 @@ void InitRayPathScreen() {
 
   target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
   camera.projection = CAMERA_PERSPECTIVE;
-  loadShaders();
 
   _Material tempMaterial = {0};
 
@@ -48,14 +49,7 @@ void InitRayPathScreen() {
 
   createTriangle(tempVertex, tempMaterial);
 
-  updateSphereShapeUniforms(shaderRayPathing);
-  updateTriangleShapeUniforms(shaderRayPathing);
-
-  printf("%f,", spheres[0].position.x);
-  printf("%f,", spheres[0].position.y);
-  printf("%f\n", spheres[0].position.z);
-
-  printf("%f\n", spheres[0].radius);
+  loadShaders();  // Always last function to call so the uniforms are updated
 }
 
 void drawShaderOnTexture() {
