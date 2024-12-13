@@ -53,7 +53,7 @@ void createTriangle(Vector3 vertex[3], _Material material) {
 
 void updateSphereShapeUniforms(Shader shader) {
   for (int i = 0; i < sphereQuantity; i++) {
-    char uniformName[40];
+    char uniformName[64];
 
     snprintf(uniformName, sizeof(uniformName), "u_spheres[%d].position", i);
     int SpherePositionLoc = GetShaderLocation(shader, uniformName);
@@ -102,7 +102,7 @@ void updateSphereShapeUniforms(Shader shader) {
 
 void updateTriangleShapeUniforms(Shader shader) {
   for (int i = 0; i < triangleQuantity; i++) {
-    char uniformName[40];
+    char uniformName[64];
 
     snprintf(uniformName, sizeof(uniformName), "u_triangles[%d].vertex[0]", i);
     int TriangleVertex0Loc = GetShaderLocation(shader, uniformName);
