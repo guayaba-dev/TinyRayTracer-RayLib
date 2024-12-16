@@ -1,5 +1,7 @@
+#include "lights.h"
 #include "materials.h"
 #include "raylib.h"
+#include "raymath.h"
 #include "rlgl.h"
 #include "screens.h"
 #include "shapes.h"
@@ -24,6 +26,8 @@ void drawShaderOnTexture();
 
 void loadShaders() {
   UnloadShader(shaderRayPathing);
+  resetLights();
+
   shaderRayPathing = LoadShader(
       0, TextFormat("resources/shaders/RayPathing.frag", GLSL_VERSION));
   // Resolution uniform
@@ -32,6 +36,9 @@ void loadShaders() {
   int resolutionLoc = GetShaderLocation(shaderRayPathing, "resolution");
   SetShaderValue(shaderRayPathing, resolutionLoc, &resolution,
                  SHADER_UNIFORM_VEC2);
+
+  createLight(LIGHT_POINT, (Vector3){0., 5., -4.}, Vector3Zero(), WHITE,
+              shaderRayPathing);
 
   updateSphereShapeUniforms(shaderRayPathing);
   updateTriangleShapeUniforms(shaderRayPathing);
@@ -51,8 +58,8 @@ void InitRayPathScreen() {
   _Material tempMaterial = {0};
 
   createSphere((Vector3){1., 1., -4.}, .2, redRubber);
-  createSphere((Vector3){1., 1., -7.}, .7, redRubber);
-  createSphere((Vector3){1., 1., -5.}, .8, shiningMate);
+  createSphere((Vector3){1., 0., -7.}, .7, redRubber);
+  createSphere((Vector3){-1., -1., -5.}, .8, shiningMate);
 
   Vector3 tempVertex[3] = {
       {1.0f, 0.0f, 0.0f},  // Primer vector

@@ -77,6 +77,7 @@ void main() {
   const float PI = 3.14159265359;
   float fov = PI/2.;
   vec2 midlePixelCalc = .5/resolution; 
+  vec3 cameraPos = vec3(0.);
 
   float aspectRatio = resolution.y/resolution.x;
 
@@ -98,15 +99,52 @@ void main() {
     if(u_spheres[i].radius == 0.) continue; //would you believe me if i told you that it took me a day to figure this out?
 
     // Verifica si hay intersección
-    if (!rayIntersectsSphere(vec3(0.), rayDirection, u_spheres[i].position, u_spheres[i].radius)) continue;
+    if (!rayIntersectsSphere(cameraPos, rayDirection, u_spheres[i].position, u_spheres[i].radius)) continue;
 
     // Actualiza el z_buffer si es más cercano
     if (intersectionPoint > z_buffer) continue;
    
     z_buffer = intersectionPoint;
-    colorFinal = u_spheres[i].material.diffuseColor; 
+   
+    vec3 hitpos = intersectionPoint*rayDirection;
+
+    vec3 normal = normalize(hitpos - u_spheres[i].position);
+
+    //light calcualtions 
+    colorFinal = u_spheres[i].material.diffuseColor;
+    
+    for(int j = 0; j < MAX_LIGHTS; j++){
+
+      if(lights[j].enabled == 1){ 
+
+        vec3 light = vec3(0.0);
+       
+        if (lights[j].type == LIGHT_DIRECTIONAL)
+        {
+          light = -normalize(lights[j].target - lights[j].position);
+        }
+
+        if (lights[j].type == LIGHT_POINT)
+        {
+           light = normalize(lights[j].position - hitpos);
+        }
+       
+        float lightDistance = distance(lights[j].position, hitpos);
+
+       //Diffuse light
+        float NdotL = max(dot(normal, light), 0.0);
+        vec3 lightDot = (lights[j].color.rgb*u_spheres[i].material.diffuseColor*NdotL);
+
+      //specular light
+        float specCo = 0.0;
+        if (NdotL > 0.0) specCo = pow(max(0.0, dot(-rayDirection, reflect(-(light), normal))), 10.0);
+       // 16 refers to shine
+        colorFinal += lightDot; 
+        colorFinal += specCo;
+      }
+
+  }
   }
 
- 
   gl_FragColor = vec4(colorFinal, 1.0); 
 }

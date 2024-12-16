@@ -7,8 +7,6 @@
 #define LIGHT_DIRECTIONAL 0
 #define LIGHT_POINT 1
 
-static int totalLights = 0;
-
 typedef struct Light {
   int enabled;
   int type;
@@ -17,16 +15,27 @@ typedef struct Light {
   Color color;
 } LIGHT;
 
-LIGHT lights[MAX_LIGHTS] = {0};
+static int totalLights = 0;
+static LIGHT lights[MAX_LIGHTS] = {0};
 
-void drawLights() {
+static void drawLights() {
   for (int i = 0; i < MAX_LIGHTS; i++) {
     DrawSphereEx(lights[i].position, 0.2, 8.f, 8.f, lights[i].color);
   }
 }
 
-void createLight(int type, Vector3 position, Vector3 target, Color color,
-                 Shader shader) {
+static void resetLights() {
+  LIGHT tempLight = {0};
+
+  for (int i = 0; i < MAX_LIGHTS; i++) {
+    lights[i] = tempLight;
+  }
+
+  totalLights = 0;
+}
+
+static void createLight(int type, Vector3 position, Vector3 target, Color color,
+                        Shader shader) {
   if (totalLights >= MAX_LIGHTS) return;
 
   lights[totalLights].enabled = 1;
