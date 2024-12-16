@@ -20,8 +20,16 @@ void InitRayPathScreen();
 void drawShaderOnTexture();
 
 void loadShaders() {
+  UnloadShader(shaderRayPathing);
   shaderRayPathing = LoadShader(
       0, TextFormat("resources/shaders/RayPathing.frag", GLSL_VERSION));
+  // Resolution uniform
+
+  Vector2 resolution = (Vector2){GetScreenWidth(), GetScreenHeight()};
+  int resolutionLoc = GetShaderLocation(shaderRayPathing, "resolution");
+  SetShaderValue(shaderRayPathing, resolutionLoc, &resolution,
+                 SHADER_UNIFORM_VEC2);
+
   updateSphereShapeUniforms(shaderRayPathing);
   updateTriangleShapeUniforms(shaderRayPathing);
   drawShaderOnTexture();
@@ -39,7 +47,7 @@ void InitRayPathScreen() {
 
   _Material tempMaterial = {0};
 
-  createSphere((Vector3){1., 1., 0.}, 5.f, tempMaterial);
+  createSphere((Vector3){1., 1., -10.}, .2, tempMaterial);
 
   Vector3 tempVertex[3] = {
       {1.0f, 0.0f, 0.0f},  // Primer vector
