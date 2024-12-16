@@ -1,3 +1,4 @@
+#pragma once
 #include <stdio.h>
 
 #include "materials.h"
@@ -69,7 +70,7 @@ void updateSphereShapeUniforms(Shader shader) {
              "u_spheres[%d].material.diffuseColor", i);
     int SphereMaterialDiffeseColorLoc = GetShaderLocation(shader, uniformName);
     SetShaderValue(shader, SphereMaterialDiffeseColorLoc,
-                   &spheres[i].material.diffuseColor, SHADER_UNIFORM_VEC4);
+                   &spheres[i].material.diffuseColor, SHADER_UNIFORM_VEC3);
 
     snprintf(uniformName, sizeof(uniformName),
              "u_spheres[%d].material.albido[0]", i);
@@ -124,7 +125,7 @@ void updateTriangleShapeUniforms(Shader shader) {
     int TriangleMaterialDiffeseColorLoc =
         GetShaderLocation(shader, uniformName);
     SetShaderValue(shader, TriangleMaterialDiffeseColorLoc,
-                   &triangles[i].material.diffuseColor, SHADER_UNIFORM_VEC4);
+                   &triangles[i].material.diffuseColor, SHADER_UNIFORM_VEC3);
 
     snprintf(uniformName, sizeof(uniformName),
              "u_triangles[%d].material.albido[0]", i);

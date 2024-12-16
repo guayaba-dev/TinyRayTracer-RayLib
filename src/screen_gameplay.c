@@ -28,7 +28,6 @@
  **********************************************************************************************/
 
 #include "lights.h"
-#include "materials.h"
 #include "raylib.h"
 #include "raymath.h"
 #include "rcamera.h"

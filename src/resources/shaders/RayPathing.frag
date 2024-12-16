@@ -27,12 +27,28 @@ struct Triangle {
   _Material material;
 };
 
+// NOTE: Add here your custom variables
+
+#define     MAX_LIGHTS              4
+#define     LIGHT_DIRECTIONAL       0
+#define     LIGHT_POINT             1
+
+struct Light {
+    int enabled;
+    int type;
+    vec3 position;
+    vec3 target;
+    vec4 color;
+};
+
+uniform Light lights[MAX_LIGHTS];
 uniform Triangle u_triangles[MAX_TRIANGLES];
 uniform Sphere u_spheres[MAX_SPHERES];
 uniform vec2 resolution; // Dimensiones del RenderTexture
 
+float intersectionPoint;
 
-bool rayIntersectsSphere(vec3 orig, vec3 dir, vec3 sphereCenter, float radius, float intersectionPoint0){
+bool rayIntersectsSphere(vec3 orig, vec3 dir, vec3 sphereCenter, float radius){
 
   vec3 hypotenuse = sphereCenter - orig; 
 
@@ -44,13 +60,13 @@ bool rayIntersectsSphere(vec3 orig, vec3 dir, vec3 sphereCenter, float radius, f
 
   float adyacentCathetus = sqrt(radius*radius - opposeCathetus);
 
-  intersectionPoint0 = projectionHtoDir - adyacentCathetus; 
+  intersectionPoint = projectionHtoDir - adyacentCathetus; 
 
   float intersectionPoint1 = projectionHtoDir + adyacentCathetus;
 
-  if(intersectionPoint0 < 0) intersectionPoint0 = intersectionPoint1;
+  if(intersectionPoint < 0) intersectionPoint = intersectionPoint1;
 
-  if(intersectionPoint0 < 0) return false;
+  if(intersectionPoint < 0) return false;
 
   return true;
 }
@@ -59,7 +75,7 @@ void main() {
 
   //Temporal camera values
   const float PI = 3.14159265359;
-  float fov = PI/4.;
+  float fov = PI/2.;
   vec2 midlePixelCalc = .5/resolution; 
 
   float aspectRatio = resolution.y/resolution.x;
@@ -77,21 +93,20 @@ void main() {
   float z_buffer = 1e20; // Profundidad inicial muy grande
 
   for (int i = 0; i < MAX_SPHERES; i++) {
-    float intersectionPoint = 0.0;
+    intersectionPoint = 0.0;
 
-    if(u_spheres[i].radius == 0.) continue; //would you beleave if i told you that it took me a day to figure this out?
+    if(u_spheres[i].radius == 0.) continue; //would you believe me if i told you that it took me a day to figure this out?
 
     // Verifica si hay intersección
-    if (!rayIntersectsSphere(vec3(0.), rayDirection, u_spheres[i].position, u_spheres[i].radius, intersectionPoint)) continue;
+    if (!rayIntersectsSphere(vec3(0.), rayDirection, u_spheres[i].position, u_spheres[i].radius)) continue;
 
     // Actualiza el z_buffer si es más cercano
     if (intersectionPoint > z_buffer) continue;
-
+   
     z_buffer = intersectionPoint;
-    colorFinal = vec3(0.4, 0.4, 0.3); // Cambia el color si hay intersección
+    colorFinal = u_spheres[i].material.diffuseColor; 
   }
 
-  // if(u_spheres[0].position.z ==  -10.) colorFinal = vec3(0.,1.,0.);
  
   gl_FragColor = vec4(colorFinal, 1.0); 
 }

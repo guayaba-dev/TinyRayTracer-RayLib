@@ -3,7 +3,7 @@
 
 // it has an _ so it doesn't interfire with raylib Material
 typedef struct _Material {
-  Color diffuseColor;
+  Vector3 diffuseColor;
   float albido[4];  // Intesity of
   // Diffuse light
   // Specular light

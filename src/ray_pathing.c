@@ -14,6 +14,9 @@ static Camera camera = {0};
 static Shader shaderRayPathing;
 RenderTexture2D target;
 
+_Material shiningMate = {(Vector3){.4, .4, .3}, {1., 1., 0., 0.}};
+_Material redRubber = {(Vector3){0.3, 0.1, 0.1}, {1., .2, 0., 0.}};
+
 // function declarations
 void LoadShaders();
 void InitRayPathScreen();
@@ -47,7 +50,9 @@ void InitRayPathScreen() {
 
   _Material tempMaterial = {0};
 
-  createSphere((Vector3){1., 1., -10.}, .2, tempMaterial);
+  createSphere((Vector3){1., 1., -4.}, .2, redRubber);
+  createSphere((Vector3){1., 1., -7.}, .7, redRubber);
+  createSphere((Vector3){1., 1., -5.}, .8, shiningMate);
 
   Vector3 tempVertex[3] = {
       {1.0f, 0.0f, 0.0f},  // Primer vector
