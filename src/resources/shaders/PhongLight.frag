@@ -69,7 +69,7 @@ void main()
 
             //specular light
             float specCo = 0.0;
-            if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewD, reflect(-(light), normal)))*2./(lightDistance*lightDistance), 64.0);
+            if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewD, reflect(-(light), normal)))*2./(lightDistance*lightDistance), 16.0);
             // 16 refers to shine
             specular += specCo;
         }
