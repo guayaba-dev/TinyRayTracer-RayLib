@@ -37,7 +37,13 @@ void loadShaders() {
   SetShaderValue(shaderRayPathing, resolutionLoc, &resolution,
                  SHADER_UNIFORM_VEC2);
 
-  createLight(LIGHT_POINT, (Vector3){0., 5., -4.}, Vector3Zero(), WHITE,
+  createLight(LIGHT_POINT, (Vector3){-20., 20., -20.}, Vector3Zero(), WHITE,
+              shaderRayPathing);
+
+  createLight(LIGHT_POINT, (Vector3){30., 50., -25.}, Vector3Zero(), WHITE,
+              shaderRayPathing);
+
+  createLight(LIGHT_POINT, (Vector3){30., 20., 30.}, Vector3Zero(), WHITE,
               shaderRayPathing);
 
   updateSphereShapeUniforms(shaderRayPathing);
@@ -57,9 +63,10 @@ void InitRayPathScreen() {
 
   _Material tempMaterial = {0};
 
-  createSphere((Vector3){1., 1., -4.}, .2, redRubber);
-  createSphere((Vector3){1., 0., -7.}, .7, redRubber);
-  createSphere((Vector3){-1., -1., -5.}, .8, shiningMate);
+  createSphere((Vector3){-3., -0., -16.}, 2., shiningMate);
+  createSphere((Vector3){-1., -1.5, -12.}, 2., redRubber);
+  createSphere((Vector3){1.5, -0.5, -18.}, 3., redRubber);
+  createSphere((Vector3){7., 5., -18.}, 4., shiningMate);
 
   Vector3 tempVertex[3] = {
       {1.0f, 0.0f, 0.0f},  // Primer vector
@@ -74,7 +81,6 @@ void InitRayPathScreen() {
 
 void drawShaderOnTexture() {
   BeginTextureMode(target);
-
   SetShapesTexture(target.texture,
                    (Rectangle){0.0f, 0.0f, (float)target.texture.width,
                                (float)target.texture.height});

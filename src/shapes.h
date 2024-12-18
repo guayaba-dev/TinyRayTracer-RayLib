@@ -4,7 +4,7 @@
 #include "materials.h"
 #include "raylib.h"
 
-#define MAX_SPHERES 3
+#define MAX_SPHERES 5
 #define MAX_TRIANGLES 20
 
 typedef struct Sphere {

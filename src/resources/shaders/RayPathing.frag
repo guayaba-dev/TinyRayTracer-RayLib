@@ -2,7 +2,7 @@
 
 precision mediump float;
 
-#define MAX_SPHERES 3
+#define MAX_SPHERES 5
 #define MAX_TRIANGLES 20
 
 in vec2 fragTexCoord;
@@ -46,9 +46,7 @@ uniform Triangle u_triangles[MAX_TRIANGLES];
 uniform Sphere u_spheres[MAX_SPHERES];
 uniform vec2 resolution; // Dimensiones del RenderTexture
 
-float intersectionPoint;
-
-bool rayIntersectsSphere(vec3 orig, vec3 dir, vec3 sphereCenter, float radius){
+bool rayIntersectsSphere(in vec3 orig, in vec3 dir, in vec3 sphereCenter, in float radius, inout float intersectionPoint){
 
   vec3 hypotenuse = sphereCenter - orig; 
 
@@ -72,13 +70,39 @@ bool rayIntersectsSphere(vec3 orig, vec3 dir, vec3 sphereCenter, float radius){
 }
 
 
-void main() {
+bool rayIntersectScene(in vec3 orig, in vec3 dir, inout vec3 hitPos, inout _Material material, inout vec3 normal){
 
+  float z_buffer = 1e20; 
+
+  for (int i = 0; i < MAX_SPHERES; i++) {
+    float intersectionPoint = 0.0;
+
+    if(u_spheres[i].radius == 0.) continue; //would you believe me if i told you that it took me a day to figure this out?
+
+    if (!rayIntersectsSphere(orig, dir, u_spheres[i].position, u_spheres[i].radius, intersectionPoint)) continue;
+
+    if (intersectionPoint > z_buffer) continue;
+   
+    z_buffer = intersectionPoint;
+   
+    hitPos = orig + intersectionPoint*dir;
+
+    normal = normalize(hitPos - u_spheres[i].position);
+
+    material = u_spheres[i].material;
+  }  
+  
+  return z_buffer < 1e20;
+
+}
+
+
+void main() {
+ 
   //Temporal camera values
   const float PI = 3.14159265359;
   float fov = PI/2.;
   vec2 midlePixelCalc = .5/resolution; 
-  vec3 cameraPos = vec3(0.);
 
   float aspectRatio = resolution.y/resolution.x;
 
@@ -90,31 +114,12 @@ void main() {
   
   rayDirection = normalize(rayDirection);
 
-  vec3 colorFinal = vec3(0.2, 0.7, 0.8);
-  
-  float z_buffer = 1e20; 
-
   vec3 hitpos = vec3(0.0);
   vec3 normal = vec3(0.0);
+  _Material currentMaterial;
+  currentMaterial.diffuseColor = vec3(0.2, 0.7, 0.8);
 
-  for (int i = 0; i < MAX_SPHERES; i++) {
-    intersectionPoint = 0.0;
-
-    if(u_spheres[i].radius == 0.) continue; //would you believe me if i told you that it took me a day to figure this out?
-
-    if (!rayIntersectsSphere(cameraPos, rayDirection, u_spheres[i].position, u_spheres[i].radius)) continue;
-
-    if (intersectionPoint > z_buffer) continue;
-   
-    z_buffer = intersectionPoint;
-   
-    hitpos = intersectionPoint*rayDirection;
-
-    normal = normalize(hitpos - u_spheres[i].position);
-
-    //light calcualtions 
-    colorFinal = u_spheres[i].material.diffuseColor;
-  }  
+  rayIntersectScene(vec3(0.0), rayDirection, hitpos, currentMaterial, normal);
 
   for(int j = 0; j < MAX_LIGHTS; j++){
 
@@ -135,19 +140,29 @@ void main() {
      //Diffuse light
       
       if(dot(normal,light) < 0.0) continue;
+      
+      float light_distance = distance(lights[j].position, hitpos);
+      vec3 shadowHit = vec3(0.0);
+      vec3 shadow_orig = hitpos + normal*1e-3;
+      vec3 shadowNormal = vec3(0.0);
+      _Material tempMaterial; 
+      tempMaterial.diffuseColor = vec3(0.0);
+
+      if(rayIntersectScene(shadow_orig, light, shadowHit, tempMaterial, shadowNormal)) {
+          if (distance(shadow_orig, shadowHit) < light_distance) continue;
+      }
 
       float NdotL = max(dot(normal, light), 0.0);
-      vec3 lightDot = (lights[j].color.rgb*colorFinal*NdotL);
+      vec3 lightDot = (lights[j].color.rgb*currentMaterial.diffuseColor*NdotL);
 
-    //specular light
+      //specular light
       float specCo = 0.0;
-      if (NdotL > 0.0) specCo = pow(max(0.0, dot(-rayDirection, reflect(-(light), normal))), 10.0);
+      if (NdotL > 0.0) specCo = pow(max(0.0, dot(-rayDirection, reflect(-(light), normal))), 100.0);
      // 16 refers to shine
 
-      colorFinal += lightDot; 
-      colorFinal += specCo;
+      currentMaterial.diffuseColor += lightDot; 
+      currentMaterial.diffuseColor += specCo;
   }  
 
-  
-  gl_FragColor = vec4(colorFinal, 1.0); 
+  gl_FragColor = vec4(currentMaterial.diffuseColor, 1.0); 
 }
