@@ -49,6 +49,7 @@ bool rayIntersectsSphere(in vec3 orig, in vec3 dir, in vec3 sphereCenter, in flo
 bool rayIntersectScene(in vec3 orig, in vec3 dir, inout vec3 hitPos, inout _Material material, inout vec3 normal);
 vec3 calculateLight(in vec3 hitpos, in vec3 dir, in vec3 normal, in _Material material);
 vec3 reflectionCalc(in vec3 hitpos, in vec3 dir, in vec3 normal, in _Material material);
+vec3 refractCalc(in vec3 hitpos, in vec3 dir, in vec3 normal, in _Material material);
 
 void main() {
  
@@ -70,19 +71,38 @@ void main() {
   vec3 hitpos = vec3(0.0);
   vec3 normal = vec3(0.0);
   _Material currentMaterial;
-  currentMaterial.diffuseColor = vec3(0.2, 0.7, 0.8);
+  currentMaterial.diffuseColor = vec3(0.2, 0.7, 0.8); //background color
 
   if(rayIntersectScene(vec3(0.0), rayDirection, hitpos, currentMaterial, normal)){
 
-
   vec3 reflectColor = reflectionCalc(hitpos, rayDirection, normal, currentMaterial);
-
-  currentMaterial.diffuseColor = calculateLight(hitpos, rayDirection, normal, currentMaterial) + reflectColor;
+  vec3 refractColor = refractCalc(hitpos, rayDirection, normal, currentMaterial);
+  currentMaterial.diffuseColor = calculateLight(hitpos, rayDirection, normal, currentMaterial) + reflectColor + refractColor;
 
   }
 
   gl_FragColor = vec4(currentMaterial.diffuseColor, 1.0); 
 
+}
+
+vec3 refractRayCalc(in vec3 dir, in vec3 normal, in float refractIndex){
+  
+  float incidentCos = dot(dir, -normal);
+  float incidentRefractIndex = 1;
+  float materialRefractIndex = refractIndex;
+
+  if(incidentCos < 0){
+    float temporalIndex = incidentRefractIndex;
+
+    incidentRefractIndex = materialRefractIndex;
+    materialRefractIndex = temporalIndex;
+    incidentCos = -incidentCos;
+    normal = -normal;
+  }
+
+  float refractRatio = incidentRefractIndex/materialRefractIndex;
+  float k = 1 - refractRatio*refractRatio*(1 - incidentCos*incidentCos);
+  return k < 0 ? vec3(0,0,0) : dir*refractRatio + normal*(refractRatio * incidentCos - sqrt(k));
 }
 
 vec3 reflectionCalc(in vec3 hitpos, in vec3 dir, in vec3 normal, in _Material material){
@@ -123,8 +143,6 @@ vec3 reflectionCalc(in vec3 hitpos, in vec3 dir, in vec3 normal, in _Material ma
     
     int reverseIndex = RECURSIVE - i - 1;
     
-    if(i == 0) reflectionColor = lightCalc[reverseIndex] * reflectiveAlbido[reverseIndex];
-
     reflectionColor = (lightCalc[reverseIndex] + reflectionColor) * reflectiveAlbido[reverseIndex];
 
   }
@@ -133,6 +151,49 @@ vec3 reflectionCalc(in vec3 hitpos, in vec3 dir, in vec3 normal, in _Material ma
 
 }
 
+
+vec3 refractCalc(in vec3 hitpos, in vec3 dir, in vec3 normal, in _Material material){
+
+  vec3 lightCalc[RECURSIVE];
+  float refractAlbido[RECURSIVE];
+ 
+  for(int i = 0; i < RECURSIVE; i++){
+    lightCalc[i] = vec3(0.0);
+    refractAlbido[i] = 0.0;
+  }
+
+  vec3 refractOrig;
+  vec3 refractDir = dir;
+  vec3 refractHit = hitpos;
+  vec3 refractNormal = normal; 
+  _Material refractMaterial = material;
+  
+  for(int i = 0; i < RECURSIVE; i++){
+
+    refractOrig = dot(refractNormal, refractDir) < 0.0 ? refractHit - refractNormal*1e-3 : refractHit + refractNormal*1e-3;
+    refractDir = normalize(refractRayCalc(refractDir, refractNormal, 1.5));
+    refractAlbido[i] = refractMaterial.albido[3];
+
+    if(!rayIntersectScene(refractOrig, refractDir, refractHit, refractMaterial, refractNormal) 
+      || i == 3)
+    {
+      lightCalc[i] = vec3(0.2, 0.7, 0.8);
+      break;
+    }
+    
+    lightCalc[i] = calculateLight(refractHit, refractDir, refractNormal, refractMaterial);
+  }
+
+  vec3 refractColor = vec3(0.0); 
+
+  for(int i = 0; i < RECURSIVE; i++){
+    int reverseIndex = RECURSIVE - i - 1;
+    refractColor = (lightCalc[reverseIndex] + refractColor) * refractAlbido[reverseIndex];
+  }                                                                                                
+
+  return refractColor;
+
+}
 
 bool rayIntersectsSphere(in vec3 orig, in vec3 dir, in vec3 sphereCenter, in float radius, inout float intersectionPoint){
   vec3 hypotenuse = sphereCenter - orig; 

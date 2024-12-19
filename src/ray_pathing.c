@@ -16,8 +16,9 @@ static Camera camera = {0};
 static Shader shaderRayPathing;
 RenderTexture2D target;
 
-_Material shiningMate = {(Vector3){.4, .4, .3}, {1., 1., 0., 0.}};
-_Material mirror = {(Vector3){1., 1., 1.}, {0., 1., .8, 0.}};
+_Material shiningMate = {(Vector3){.4, .4, .3}, {1., 1., 0.2, 0.}};
+_Material mirror = {(Vector3){1., 1., 1.}, {0., 10., .8, 0.}};
+_Material glass = {(Vector3){0.6, 0.7, 0.8}, {0., .5, .1, 0.8}};
 _Material redRubber = {(Vector3){0.3, 0.1, 0.1}, {1., .2, 0., 0.}};
 
 // function declarations
@@ -65,7 +66,7 @@ void InitRayPathScreen() {
   _Material tempMaterial = {0};
 
   createSphere((Vector3){-3., -0., -16.}, 2., shiningMate);
-  createSphere((Vector3){-1., -1.5, -12.}, 2., mirror);
+  createSphere((Vector3){-1., -1.5, -12.}, 2., glass);
   createSphere((Vector3){1.5, -0.5, -18.}, 3., redRubber);
   createSphere((Vector3){7., 5., -18.}, 4., mirror);
 
