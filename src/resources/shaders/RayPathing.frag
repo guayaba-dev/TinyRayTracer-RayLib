@@ -2,6 +2,7 @@
 
 precision mediump float;
 
+#define RECURSIVE 8
 #define MAX_SPHERES 5
 #define MAX_TRIANGLES 20
 
@@ -36,11 +37,7 @@ struct Triangle {
 struct Light {
     int enabled;
     int type;
-    vec3 position;
-    vec3 target;
-    vec4 color;
-};
-
+    vec3 position; vec3 target; vec4 color; };
 uniform Light lights[MAX_LIGHTS];
 uniform Triangle u_triangles[MAX_TRIANGLES];
 uniform Sphere u_spheres[MAX_SPHERES];
@@ -51,7 +48,7 @@ uniform vec2 resolution; // Dimensiones del RenderTexture
 bool rayIntersectsSphere(in vec3 orig, in vec3 dir, in vec3 sphereCenter, in float radius, inout float intersectionPoint);
 bool rayIntersectScene(in vec3 orig, in vec3 dir, inout vec3 hitPos, inout _Material material, inout vec3 normal);
 vec3 calculateLight(in vec3 hitpos, in vec3 dir, in vec3 normal, in _Material material);
-
+vec3 reflectionCalc(in vec3 hitpos, in vec3 dir, in vec3 normal, in _Material material);
 
 void main() {
  
@@ -75,12 +72,65 @@ void main() {
   _Material currentMaterial;
   currentMaterial.diffuseColor = vec3(0.2, 0.7, 0.8);
 
-  rayIntersectScene(vec3(0.0), rayDirection, hitpos, currentMaterial, normal);
+  if(rayIntersectScene(vec3(0.0), rayDirection, hitpos, currentMaterial, normal)){
 
-  currentMaterial.diffuseColor += calculateLight(hitpos, rayDirection, normal, currentMaterial);
 
+  vec3 reflectColor = reflectionCalc(hitpos, rayDirection, normal, currentMaterial);
+
+  currentMaterial.diffuseColor = calculateLight(hitpos, rayDirection, normal, currentMaterial) + reflectColor;
+
+  }
 
   gl_FragColor = vec4(currentMaterial.diffuseColor, 1.0); 
+
+}
+
+vec3 reflectionCalc(in vec3 hitpos, in vec3 dir, in vec3 normal, in _Material material){
+
+  vec3 lightCalc[RECURSIVE];
+  float reflectiveAlbido[RECURSIVE];
+ 
+  for(int i = 0; i < RECURSIVE; i++){
+    lightCalc[i] = vec3(0.0);
+    reflectiveAlbido[i] = 0.0;
+  }
+
+  vec3 reflectOrig;
+  vec3 reflectDir = dir;
+  vec3 reflectHit = hitpos;
+  vec3 reflectNormal = normal; 
+  _Material reflectMaterial = material;
+  
+  for(int i = 0; i < RECURSIVE; i++){
+
+    reflectOrig = reflectHit + reflectNormal*1e-3;
+    reflectDir = normalize(reflect(reflectDir, reflectNormal));
+    reflectiveAlbido[i] = reflectMaterial.albido[2];
+
+    if(!rayIntersectScene(reflectOrig, reflectDir, reflectHit, reflectMaterial, reflectNormal) 
+      || i == 3)
+    {
+      lightCalc[i] = vec3(0.2, 0.7, 0.8);
+      break;
+    }
+    
+    lightCalc[i] = calculateLight(reflectHit, reflectDir, reflectNormal, reflectMaterial);
+  }
+
+  vec3 reflectionColor = vec3(0.0); 
+
+  for(int i = 0; i < RECURSIVE; i++){
+    
+    int reverseIndex = RECURSIVE - i - 1;
+    
+    if(i == 0) reflectionColor = lightCalc[reverseIndex] * reflectiveAlbido[reverseIndex];
+
+    reflectionColor = (lightCalc[reverseIndex] + reflectionColor) * reflectiveAlbido[reverseIndex];
+
+  }
+
+  return reflectionColor;
+
 }
 
 
@@ -164,6 +214,5 @@ vec3 calculateLight(in vec3 hitpos, in vec3 dir, in vec3 normal, in _Material ma
       specularSum += specCo;
   }  
 
-  return diffuseSum + specularSum;
-
+  return diffuseSum*material.albido[0] + specularSum*material.albido[1];
 }

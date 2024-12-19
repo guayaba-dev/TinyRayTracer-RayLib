@@ -17,6 +17,7 @@ static Shader shaderRayPathing;
 RenderTexture2D target;
 
 _Material shiningMate = {(Vector3){.4, .4, .3}, {1., 1., 0., 0.}};
+_Material mirror = {(Vector3){1., 1., 1.}, {0., 1., .8, 0.}};
 _Material redRubber = {(Vector3){0.3, 0.1, 0.1}, {1., .2, 0., 0.}};
 
 // function declarations
@@ -64,9 +65,9 @@ void InitRayPathScreen() {
   _Material tempMaterial = {0};
 
   createSphere((Vector3){-3., -0., -16.}, 2., shiningMate);
-  createSphere((Vector3){-1., -1.5, -12.}, 2., redRubber);
+  createSphere((Vector3){-1., -1.5, -12.}, 2., mirror);
   createSphere((Vector3){1.5, -0.5, -18.}, 3., redRubber);
-  createSphere((Vector3){7., 5., -18.}, 4., shiningMate);
+  createSphere((Vector3){7., 5., -18.}, 4., mirror);
 
   Vector3 tempVertex[3] = {
       {1.0f, 0.0f, 0.0f},  // Primer vector
