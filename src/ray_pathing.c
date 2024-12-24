@@ -28,8 +28,6 @@ int viewCenterLoc;
 int runTimeLoc;
 int resolutionLoc;
 
-bool monsterMode;
-
 // function declarations
 void LoadShaders();
 void InitRayPathScreen();
@@ -117,11 +115,15 @@ void UpdateRayPathScreen() {
                         camera.position.z};
   float cameraTarget[3] = {camera.target.x, camera.target.y, camera.target.z};
 
-  printf("CameraPos: x=%f, y=%f, z=%f \n", cameraPos[0], cameraPos[1],
+  printf("CameraPos: x=%f, y=%f, z=%f \n ", cameraPos[0], cameraPos[1],
          cameraPos[2]);
 
-  printf("cameraTarget: x=%f, y=%f, z=%f", cameraTarget[0], cameraTarget[1],
+  printf("cameraTarget: x=%f, y=%f, z=%f \n ", cameraTarget[0], cameraTarget[1],
          cameraTarget[2]);
+
+  printf("camera normalize: x=%f, y=%f, z=%f \n ",
+         cameraTarget[0] - cameraPos[0], cameraTarget[1] - cameraPos[1],
+         cameraTarget[2] - cameraPos[2]);
 
   SetShaderValue(shaderRayPathing, viewEyeLoc, cameraPos, SHADER_UNIFORM_VEC3);
   SetShaderValue(shaderRayPathing, viewCenterLoc, cameraTarget,

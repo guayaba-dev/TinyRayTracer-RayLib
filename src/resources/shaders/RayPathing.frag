@@ -65,7 +65,7 @@ void main() {
   float aspectRatio = resolution.y/resolution.x;
 
   vec3 up = vec3(0.,1.,0.);
-  vec3 viewDir = (viewCenter - viewEye);
+  vec3 viewDir = normalize(viewCenter - viewEye);
   vec3 planeRight = normalize(cross(viewDir, up));
   vec3 planeUp = normalize(cross(planeRight, viewDir));
 
@@ -74,7 +74,7 @@ void main() {
   planeCoords.y *= aspectRatio;
    
   vec3 rayDirection = vec3(0.); 
-  rayDirection = planeCoords.x*planeRight + planeCoords.y * planeUp + viewCenter - viewEye;
+  rayDirection = planeCoords.x*planeRight + planeCoords.y * planeUp + viewDir;
 
   // rayDirection = vec3(planeCoords.x, planeCoords.y, -1.f);
 
