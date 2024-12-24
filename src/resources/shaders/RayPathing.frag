@@ -37,11 +37,15 @@ struct Triangle {
 struct Light {
     int enabled;
     int type;
-    vec3 position; vec3 target; vec4 color; };
+    vec3 position; vec3 target; vec4 color; 
+};
+
 uniform Light lights[MAX_LIGHTS];
 uniform Triangle u_triangles[MAX_TRIANGLES];
 uniform Sphere u_spheres[MAX_SPHERES];
 uniform vec2 resolution; // Dimensiones del RenderTexture
+uniform vec3 viewEye;
+uniform vec3 viewCenter;
 
 // function definitions 
 
@@ -60,12 +64,20 @@ void main() {
 
   float aspectRatio = resolution.y/resolution.x;
 
-  vec3 rayDirection = vec3(1.); 
+  vec3 up = vec3(0.,1.,0.);
+  vec3 viewDir = (viewCenter - viewEye);
+  vec3 planeRight = normalize(cross(viewDir, up));
+  vec3 planeUp = normalize(cross(planeRight, viewDir));
 
-  rayDirection.xy = (fragTexCoord - 0.5)*tan(fov/2.)*2.;
-  rayDirection.y *= aspectRatio;
-  rayDirection.z = -1;
-  
+  vec2 planeCoords = vec2(0.0);
+  planeCoords.xy = (fragTexCoord - 0.5)*tan(fov/2.)*2.;
+  planeCoords.y *= aspectRatio;
+   
+  vec3 rayDirection = vec3(0.); 
+  rayDirection = planeCoords.x*planeRight + planeCoords.y * planeUp + viewCenter - viewEye;
+
+  // rayDirection = vec3(planeCoords.x, planeCoords.y, -1.f);
+
   rayDirection = normalize(rayDirection);
 
   vec3 hitpos = vec3(0.0);
@@ -73,7 +85,7 @@ void main() {
   _Material currentMaterial;
   currentMaterial.diffuseColor = vec3(0.2, 0.7, 0.8); //background color
 
-  if(rayIntersectScene(vec3(0.0), rayDirection, hitpos, currentMaterial, normal)){
+  if(rayIntersectScene(viewEye, rayDirection, hitpos, currentMaterial, normal)){
 
   vec3 reflectColor = reflectionCalc(hitpos, rayDirection, normal, currentMaterial);
   vec3 refractColor = refractCalc(hitpos, rayDirection, normal, currentMaterial);
@@ -128,7 +140,7 @@ vec3 reflectionCalc(in vec3 hitpos, in vec3 dir, in vec3 normal, in _Material ma
     reflectiveAlbido[i] = reflectMaterial.albido[2];
 
     if(!rayIntersectScene(reflectOrig, reflectDir, reflectHit, reflectMaterial, reflectNormal) 
-      || i == 3)
+      )
     {
       lightCalc[i] = vec3(0.2, 0.7, 0.8);
       break;
@@ -175,7 +187,7 @@ vec3 refractCalc(in vec3 hitpos, in vec3 dir, in vec3 normal, in _Material mater
     refractAlbido[i] = refractMaterial.albido[3];
 
     if(!rayIntersectScene(refractOrig, refractDir, refractHit, refractMaterial, refractNormal) 
-      || i == 3)
+      )
     {
       lightCalc[i] = vec3(0.2, 0.7, 0.8);
       break;

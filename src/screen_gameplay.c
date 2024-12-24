@@ -60,8 +60,9 @@ void InitGameplayScreen(void) {
   framesCounter = 0;
   finishScreen = 0;
 
-  camera.position = (Vector3){0.f, 4.f, 4.f};
+  camera.position = (Vector3){0., 0.1, 0.1};
   camera.up = (Vector3){0.f, 1.f, 0.f};
+  camera.target = (Vector3){0.f, 0.f, -1.f};
   camera.fovy = 60.f;
   camera.projection = CAMERA_PERSPECTIVE;
 
