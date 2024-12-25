@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #include "lights.h"
 #include "materials.h"
 #include "raylib.h"
@@ -20,7 +18,7 @@ RenderTexture2D target;
 
 _Material shiningMate = {(Vector3){.4, .4, .3}, {1., 1., 0.2, 0.}};
 _Material mirror = {(Vector3){1., 1., 1.}, {0., 10., .8, 0.}};
-_Material glass = {(Vector3){0.6, 0.7, 0.8}, {0., .5, .1, 0.8}};
+_Material glass = {(Vector3){0.6, 0.7, 0.8}, {0.1, .5, .1, 0.8}};
 _Material redRubber = {(Vector3){0.3, 0.1, 0.1}, {1., .2, 0., 0.}};
 
 int viewEyeLoc;
@@ -77,18 +75,18 @@ void InitRayPathScreen() {
 
   _Material tempMaterial = {0};
 
-  createSphere((Vector3){-3., -0., 16.}, 2., shiningMate);
+  createSphere((Vector3){-3., -0., -16.}, 2., shiningMate);
   createSphere((Vector3){-1., -1.5, -12.}, 2., glass);
   createSphere((Vector3){1.5, -0.5, -18.}, 3., redRubber);
-  createSphere((Vector3){7., 5., 18.}, 4., mirror);
+  createSphere((Vector3){7., 5., -18.}, 4., mirror);
 
   Vector3 tempVertex[3] = {
-      {1.0f, 0.0f, 0.0f},  // Primer vector
-      {0.0f, 0.0f, 0.0f},  // Segundo vector
-      {0.0f, 0.0f, 0.0f}   // Tercer vector
+      {0.0f, 0.0f, -8.0f},    // Primer vector
+      {15.0f, 15.0f, -8.0f},  // Segundo vector
+      {30.0f, 0.0f, -8.0f}    // Tercer vector
   };
 
-  createTriangle(tempVertex, tempMaterial);
+  createTriangle(tempVertex, redRubber);
 
   loadShaders();  // Always last function to call so the uniforms are updated
 }
@@ -114,16 +112,6 @@ void UpdateRayPathScreen() {
   float cameraPos[3] = {camera.position.x, camera.position.y,
                         camera.position.z};
   float cameraTarget[3] = {camera.target.x, camera.target.y, camera.target.z};
-
-  printf("CameraPos: x=%f, y=%f, z=%f \n ", cameraPos[0], cameraPos[1],
-         cameraPos[2]);
-
-  printf("cameraTarget: x=%f, y=%f, z=%f \n ", cameraTarget[0], cameraTarget[1],
-         cameraTarget[2]);
-
-  printf("camera normalize: x=%f, y=%f, z=%f \n ",
-         cameraTarget[0] - cameraPos[0], cameraTarget[1] - cameraPos[1],
-         cameraTarget[2] - cameraPos[2]);
 
   SetShaderValue(shaderRayPathing, viewEyeLoc, cameraPos, SHADER_UNIFORM_VEC3);
   SetShaderValue(shaderRayPathing, viewCenterLoc, cameraTarget,

@@ -24,6 +24,7 @@ struct Sphere {
 };
 
 struct Triangle {
+  int enabled;
   vec3 vertex[3];
   _Material material;
 };
@@ -82,8 +83,7 @@ void main() {
 
   vec3 hitpos = vec3(0.0);
   vec3 normal = vec3(0.0);
-  _Material currentMaterial;
-  currentMaterial.diffuseColor = vec3(0.2, 0.7, 0.8); //background color
+  _Material currentMaterial; currentMaterial.diffuseColor = vec3(0.2, 0.7, 0.8); //background color
 
   if(rayIntersectScene(viewEye, rayDirection, hitpos, currentMaterial, normal)){
 
@@ -220,20 +220,90 @@ bool rayIntersectsSphere(in vec3 orig, in vec3 dir, in vec3 sphereCenter, in flo
   return true;
 }
 
+bool rayIntersectsTriangle(in vec3 orig, in vec3 dir, in vec3[3] vertex, 
+                           inout float intersectionPoint, inout vec3 normal){
+  
+  vec3 ABdir = (vertex[1] - vertex[0]);
+  vec3 ACdir = (vertex[2] - vertex[0]);
 
-bool rayIntersectScene(in vec3 orig, in vec3 dir, inout vec3 hitPos, inout _Material material, inout vec3 normal){
+  normal = normalize(cross(ABdir,ACdir));
+  
+  if(abs(dot(dir, normal)) < 1e-6) return false;
+  
+  intersectionPoint = dot(normal,(vertex[0] - orig))/dot(normal,dir); 
+  
+  if(intersectionPoint < 0) return false;
+
+  vec3 intersectionPlane = orig + intersectionPoint*dir; 
+  
+  //Barycentric coordinate
+  vec3 v0 = vertex[1] - vertex[0]; // AB
+  vec3 v1 = vertex[2] - vertex[0]; // AC
+  vec3 v2 = intersectionPlane - vertex[0]; // Punto de intersección desde A
+
+  float d00 = dot(v0, v0);
+  float d01 = dot(v0, v1);
+  float d11 = dot(v1, v1);
+  float d20 = dot(v2, v0);
+  float d21 = dot(v2, v1);
+
+  float denom = d00 * d11 - d01 * d01;
+  if (abs(denom) < 1e-6) return false; // Evita divisiones por cero
+
+  float v = (d11 * d20 - d01 * d21) / denom;
+  float w = (d00 * d21 - d01 * d20) / denom;
+  float u = 1.0 - v - w;
+
+  // Verifica si está dentro del triángulo
+  if (u < 0.0 || v < 0.0 || w < 0.0) return false;
+
+  return true;
+
+}
+
+
+bool rayIntersectScene(in vec3 orig, in vec3 dir, inout vec3 hitPos,
+                       inout _Material material, inout vec3 normal)
+{
+
   float z_buffer = 1e20; 
+
+  for (int j=0; j < MAX_TRIANGLES; j++) {
+    float intersectionPoint = 0.0;
+    vec3 tempNormal = vec3(0.0);
+
+    if(u_triangles[j].enabled == 0) 
+      continue;
+
+    if (!rayIntersectsTriangle(orig, dir, u_triangles[j].vertex,
+                               intersectionPoint, tempNormal))
+      continue;
+
+    if (intersectionPoint > z_buffer) continue;
+    z_buffer = intersectionPoint;
+    hitPos = orig + intersectionPoint*dir;
+    normal = tempNormal;
+    material = u_triangles[j].material;
+  }
   
   for (int i = 0; i < MAX_SPHERES; i++) {
     float intersectionPoint = 0.0;
-    if(u_spheres[i].radius == 0.) continue; //would you believe me if i told you that it took me a day to figure this out?
-    if (!rayIntersectsSphere(orig, dir, u_spheres[i].position, u_spheres[i].radius, intersectionPoint)) continue;
+
+    //would you believe me if i told you that it took me a day to figure this out?
+    if(u_spheres[i].radius == 0.) continue;
+
+    if (!rayIntersectsSphere(orig, dir, u_spheres[i].position,
+                             u_spheres[i].radius, intersectionPoint))
+      continue;
+
     if (intersectionPoint > z_buffer) continue;
     z_buffer = intersectionPoint;
     hitPos = orig + intersectionPoint*dir;
     normal = normalize(hitPos - u_spheres[i].position);
     material = u_spheres[i].material;
   }  
+
+
 
   return z_buffer < 1e20;
 }

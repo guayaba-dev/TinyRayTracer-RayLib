@@ -1,4 +1,5 @@
 #pragma once
+#include <stdbool.h>
 #include <stdio.h>
 
 #include "materials.h"
@@ -15,6 +16,7 @@ typedef struct Sphere {
 } SPHERE;
 
 typedef struct triangle {
+  int enabled;
   Vector3 vertex[3];
   _Material material;
 
@@ -41,6 +43,7 @@ void createSphere(Vector3 position, float radius, _Material material) {
 
 void createTriangle(Vector3 vertex[3], _Material material) {
   TRIANGLE tempTriangle;
+  tempTriangle.enabled = 1;
   tempTriangle.vertex[0] = vertex[0];
   tempTriangle.vertex[1] = vertex[1];
   tempTriangle.vertex[2] = vertex[2];
@@ -104,6 +107,11 @@ void updateSphereShapeUniforms(Shader shader) {
 void updateTriangleShapeUniforms(Shader shader) {
   for (int i = 0; i < MAX_TRIANGLES; i++) {
     char uniformName[64];
+
+    snprintf(uniformName, sizeof(uniformName), "u_triangles[%d].enabled", i);
+    int TriangleEnabledLoc = GetShaderLocation(shader, uniformName);
+    SetShaderValue(shader, TriangleEnabledLoc, &triangles[i].enabled,
+                   SHADER_UNIFORM_INT);
 
     snprintf(uniformName, sizeof(uniformName), "u_triangles[%d].vertex[0]", i);
     int TriangleVertex0Loc = GetShaderLocation(shader, uniformName);
