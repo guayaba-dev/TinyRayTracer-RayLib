@@ -80,13 +80,20 @@ void InitRayPathScreen() {
   createSphere((Vector3){1.5, -0.5, -18.}, 3., redRubber);
   createSphere((Vector3){7., 5., -18.}, 4., mirror);
 
-  Vector3 tempVertex[3] = {
-      {0.0f, 0.0f, -8.0f},    // Primer vector
-      {15.0f, 15.0f, -8.0f},  // Segundo vector
-      {30.0f, 0.0f, -8.0f}    // Tercer vector
+  Vector3 tempVertex0[3] = {
+      {150.0f, -4.0f, -150.0f},   // Primer vector
+      {-150.0f, -4.0f, -150.0f},  // Segundo vector
+      {150.0f, -4.0f, 150.0f}     // Tercer vector
   };
 
-  createTriangle(tempVertex, redRubber);
+  Vector3 tempVertex1[3] = {
+      {-150.0f, -4.0f, 150.0f},  // Primer vector
+      {150.0f, -4.0f, 150.0f},   // Segundo vector
+      {-150.0f, -4.0f, -150.0f}  // Tercer vector
+  };
+
+  createTriangle(tempVertex0, shiningMate);
+  createTriangle(tempVertex1, shiningMate);
 
   loadShaders();  // Always last function to call so the uniforms are updated
 }

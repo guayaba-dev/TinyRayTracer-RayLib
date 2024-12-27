@@ -56,6 +56,15 @@ vec3 calculateLight(in vec3 hitpos, in vec3 dir, in vec3 normal, in _Material ma
 vec3 reflectionCalc(in vec3 hitpos, in vec3 dir, in vec3 normal, in _Material material);
 vec3 refractCalc(in vec3 hitpos, in vec3 dir, in vec3 normal, in _Material material);
 
+float random (vec2 st) {
+    return fract(sin(dot(st.xy,
+                         vec2(12.9898,78.233)))*
+        43758.5453123);
+}
+
+// vec3 backgroundColor = vec3(0.2, 0.7, 0.8); //background color
+vec3 backgroundColor = vec3(0., 0., 0.); //background color
+
 void main() {
  
   //Temporal camera values
@@ -70,20 +79,21 @@ void main() {
   vec3 planeRight = normalize(cross(viewDir, up));
   vec3 planeUp = normalize(cross(planeRight, viewDir));
 
+  float offsetNum = random(fragTexCoord)*1e-4;
+
   vec2 planeCoords = vec2(0.0);
-  planeCoords.xy = (fragTexCoord - 0.5)*tan(fov/2.)*2.;
+  planeCoords.xy = (fragTexCoord - 0.5 + offsetNum)*tan(fov/2.)*2.;
   planeCoords.y *= aspectRatio;
    
   vec3 rayDirection = vec3(0.); 
   rayDirection = planeCoords.x*planeRight + planeCoords.y * planeUp + viewDir;
 
-  // rayDirection = vec3(planeCoords.x, planeCoords.y, -1.f);
 
   rayDirection = normalize(rayDirection);
 
   vec3 hitpos = vec3(0.0);
   vec3 normal = vec3(0.0);
-  _Material currentMaterial; currentMaterial.diffuseColor = vec3(0.2, 0.7, 0.8); //background color
+  _Material currentMaterial; currentMaterial.diffuseColor = backgroundColor; //background color
 
   if(rayIntersectScene(viewEye, rayDirection, hitpos, currentMaterial, normal)){
 
@@ -142,7 +152,7 @@ vec3 reflectionCalc(in vec3 hitpos, in vec3 dir, in vec3 normal, in _Material ma
     if(!rayIntersectScene(reflectOrig, reflectDir, reflectHit, reflectMaterial, reflectNormal) 
       )
     {
-      lightCalc[i] = vec3(0.2, 0.7, 0.8);
+      lightCalc[i] = backgroundColor; 
       break;
     }
     
@@ -189,7 +199,7 @@ vec3 refractCalc(in vec3 hitpos, in vec3 dir, in vec3 normal, in _Material mater
     if(!rayIntersectScene(refractOrig, refractDir, refractHit, refractMaterial, refractNormal) 
       )
     {
-      lightCalc[i] = vec3(0.2, 0.7, 0.8);
+      lightCalc[i] = backgroundColor; 
       break;
     }
     
@@ -226,7 +236,7 @@ bool rayIntersectsTriangle(in vec3 orig, in vec3 dir, in vec3[3] vertex,
   vec3 ABdir = (vertex[1] - vertex[0]);
   vec3 ACdir = (vertex[2] - vertex[0]);
 
-  normal = normalize(cross(ABdir,ACdir));
+  normal = abs(normalize(cross(ABdir,ACdir)));
   
   if(abs(dot(dir, normal)) < 1e-6) return false;
   
