@@ -1,5 +1,4 @@
-# ** TinyRayTracer **
-___ 
+#  TinyRayTracer 
 
 **Small RayTracing using raylib and GLSL**
 
