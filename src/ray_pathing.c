@@ -81,19 +81,74 @@ void InitRayPathScreen() {
   createSphere((Vector3){7., 5., -18.}, 4., mirror);
 
   Vector3 tempVertex0[3] = {
-      {150.0f, -4.0f, -150.0f},   // Primer vector
-      {-150.0f, -4.0f, -150.0f},  // Segundo vector
-      {150.0f, -4.0f, 150.0f}     // Tercer vector
+      {-8.0f, -4.0f, -8.0f},  // Primer vector
+      {12.0f, -4.0f, -8.0f},  // Segundo vector
+      {12.0f, -4.0f, -28.0f}  // Tercer vector
   };
 
   Vector3 tempVertex1[3] = {
-      {-150.0f, -4.0f, 150.0f},  // Primer vector
-      {150.0f, -4.0f, 150.0f},   // Segundo vector
-      {-150.0f, -4.0f, -150.0f}  // Tercer vector
+      {-8.0f, -4.0f, -28.0f},  // Primer vector
+      {12.0f, -4.0f, -28.0f},  // Segundo vector
+      {-8.0f, -4.0f, -8.0f}    // Tercer vector
   };
 
-  createTriangle(tempVertex0, shiningMate);
+  Vector3 tempVertex2[3] = {
+      {-8.0f, -4.0f, -8.0f},   // Primer vector
+      {-8.0f, -4.0f, -28.0f},  // Segundo vector
+      {-8.0f, 16.0f, -28.0f}   // Tercer vector
+  };
+
+  Vector3 tempVertex3[3] = {
+      {-8.0f, -4.0f, -8.0f},  // Primer vector
+      {-8.0f, 16.0f, -8.0f},  // Segundo vector
+      {-8.0f, 16.0f, -28.0f}  // Tercer vector
+  };
+
+  Vector3 tempVertex4[3] = {
+      {12.0f, -4.0f, -8.0f},   // Primer vector
+      {12.0f, -4.0f, -28.0f},  // Segundo vector
+      {12.0f, 16.0f, -28.0f}   // Tercer vector
+  };
+
+  Vector3 tempVertex5[3] = {
+      {12.0f, -4.0f, -8.0f},  // Primer vector
+      {12.0f, 16.0f, -8.0f},  // Segundo vector
+      {12.0f, 16.0f, -28.0f}  // Tercer vector
+  };
+
+  Vector3 tempVertex6[3] = {
+      {-8.0f, -4.0f, -28.0f},  // Primer vector
+      {12.0f, -4.0f, -28.0f},  // Segundo vector
+      {12.0f, 16.0f, -28.0f}   // Tercer vector
+  };
+
+  Vector3 tempVertex7[3] = {
+      {-8.0f, -4.0f, -28.0f},  // Primer vector
+      {-8.0f, 16.0f, -28.0f},  // Segundo vector
+      {12.0f, 16.0f, -28.0f}   // Tercer vector
+  };
+
+  Vector3 tempVertex8[3] = {
+      {-8.0f, 16.0f, -8.0f},  // Primer vector
+      {12.0f, 16.0f, -8.0f},  // Segundo vector
+      {12.0f, 16.0f, -28.0f}  // Tercer vector
+  };
+
+  Vector3 tempVertex9[3] = {
+      {-8.0f, 16.0f, -28.0f},  // Primer vector
+      {12.0f, 16.0f, -28.0f},  // Segundo vector
+      {-8.0f, 16.0f, -8.0f}    // Tercer vector
+  };
+
   createTriangle(tempVertex1, shiningMate);
+  createTriangle(tempVertex2, shiningMate);
+  createTriangle(tempVertex3, shiningMate);
+  createTriangle(tempVertex4, shiningMate);
+  createTriangle(tempVertex5, shiningMate);
+  createTriangle(tempVertex6, shiningMate);
+  createTriangle(tempVertex7, shiningMate);
+  createTriangle(tempVertex8, shiningMate);
+  createTriangle(tempVertex9, shiningMate);
 
   loadShaders();  // Always last function to call so the uniforms are updated
 }

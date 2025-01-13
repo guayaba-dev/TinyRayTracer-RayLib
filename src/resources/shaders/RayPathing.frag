@@ -74,6 +74,7 @@ void main() {
 
   float aspectRatio = resolution.y/resolution.x;
 
+  //Camera logic
   vec3 up = vec3(0.,1.,0.);
   vec3 viewDir = normalize(viewCenter - viewEye);
   vec3 planeRight = normalize(cross(viewDir, up));
