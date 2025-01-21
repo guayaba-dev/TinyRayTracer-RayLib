@@ -1,8 +1,11 @@
-#  TinyRayTracer 
+#  TinyRayTracer *
+___ 
 
 **Small RayTracing using raylib and GLSL**
 
 This is a small program that is designed to demonstrate how Ray Tracing works in a simple way, using raylib to access OpenGL API. It serves as an example for understanding the basics of Ray Tracing. While it's not remotly optimized, it can be a helpful reference if needed.
+
+![Alt text](src/resources/ScreenShot.png "Quick peek into the project ")
 ___
 
 **Build process**
