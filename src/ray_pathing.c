@@ -142,13 +142,13 @@ void InitRayPathScreen() {
 
   createTriangle(tempVertex1, shiningMate);
   createTriangle(tempVertex2, shiningMate);
-  createTriangle(tempVertex3, shiningMate);
-  createTriangle(tempVertex4, shiningMate);
-  createTriangle(tempVertex5, shiningMate);
-  createTriangle(tempVertex6, shiningMate);
-  createTriangle(tempVertex7, shiningMate);
-  createTriangle(tempVertex8, shiningMate);
-  createTriangle(tempVertex9, shiningMate);
+  // createTriangle(tempVertex3, shiningMate);
+  // createTriangle(tempVertex4, shiningMate);
+  // createTriangle(tempVertex5, shiningMate);
+  // createTriangle(tempVertex6, shiningMate);
+  // createTriangle(tempVertex7, shiningMate);
+  // createTriangle(tempVertex8, shiningMate);
+  // createTriangle(tempVertex9, shiningMate);
 
   loadShaders();  // Always last function to call so the uniforms are updated
 }

@@ -27,8 +27,8 @@ Font font = {0};
 // Local Variables Definition (local to this module)
 //----------------------------------------------------------------------------------
 
-static const int screenWidth = 800;
-static const int screenHeight = 450;
+static const int screenWidth = 1024;
+static const int screenHeight = 600;
 
 // Required variables to manage screen transitins (fade-in, fade-out)
 static float transAlpha = 0.0f;

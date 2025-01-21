@@ -81,7 +81,6 @@ void main() {
   vec3 planeUp = normalize(cross(planeRight, viewDir));
 
   float offsetNum = random(fragTexCoord)*1e-4;
-
   vec2 planeCoords = vec2(0.0);
   planeCoords.xy = (fragTexCoord - 0.5 + offsetNum)*tan(fov/2.)*2.;
   planeCoords.y *= aspectRatio;
