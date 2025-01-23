@@ -47,6 +47,7 @@ uniform Sphere u_spheres[MAX_SPHERES];
 uniform vec2 resolution; // Dimensiones del RenderTexture
 uniform vec3 viewEye;
 uniform vec3 viewCenter;
+uniform vec3 viewUp;
 
 // function definitions 
 
@@ -75,7 +76,7 @@ void main() {
   float aspectRatio = resolution.y/resolution.x;
 
   //Camera logic
-  vec3 up = vec3(0.,1.,0.);
+  vec3 up = viewUp; 
   vec3 viewDir = normalize(viewCenter - viewEye);
   vec3 planeRight = normalize(cross(viewDir, up));
   vec3 planeUp = normalize(cross(planeRight, viewDir));

@@ -23,6 +23,7 @@ _Material redRubber = {(Vector3){0.3, 0.1, 0.1}, {1., .2, 0., 0.}};
 
 int viewEyeLoc;
 int viewCenterLoc;
+int viewUpLoc;
 int runTimeLoc;
 int resolutionLoc;
 
@@ -41,6 +42,7 @@ void loadShaders() {
 
   viewEyeLoc = GetShaderLocation(shaderRayPathing, "viewEye");
   viewCenterLoc = GetShaderLocation(shaderRayPathing, "viewCenter");
+  viewUpLoc = GetShaderLocation(shaderRayPathing, "viewUp");
   resolutionLoc = GetShaderLocation(shaderRayPathing, "resolution");
 
   Vector2 resolution = (Vector2){GetScreenWidth(), GetScreenHeight()};
@@ -175,9 +177,12 @@ void UpdateRayPathScreen() {
                         camera.position.z};
   float cameraTarget[3] = {camera.target.x, camera.target.y, camera.target.z};
 
+  float cameraUp[3] = {camera.up.x, camera.up.y, camera.up.z};
+
   SetShaderValue(shaderRayPathing, viewEyeLoc, cameraPos, SHADER_UNIFORM_VEC3);
   SetShaderValue(shaderRayPathing, viewCenterLoc, cameraTarget,
                  SHADER_UNIFORM_VEC3);
+  SetShaderValue(shaderRayPathing, viewUpLoc, cameraUp, SHADER_UNIFORM_VEC3);
 
   if (IsKeyPressed(KEY_R)) loadShaders();
 
