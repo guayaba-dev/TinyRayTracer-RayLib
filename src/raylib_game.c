@@ -247,7 +247,7 @@ static void UpdateDrawFrame(void) {
     switch (currentScreen) {
       case LOGO: {
         UpdateLogoScreen();
-        if (FinishLogoScreen()) TransitionToScreen(GAMEPLAY);
+        if (FinishLogoScreen()) TransitionToScreen(RAYPATH);
       } break;
 
       case GAMEPLAY: {
