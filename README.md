@@ -12,7 +12,7 @@ ___
 
 To build the program you need CMake. In the project folder, run the following command in your terminal:
 
-`mkdir buid`
+`mkdir build`
 
 `cmake -S . -B build` 
 
